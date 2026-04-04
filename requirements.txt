@@ -6,7 +6,7 @@ uvicorn[standard]==0.30.6
 sqlalchemy==2.0.35
 
 # PostgreSQL driver (for Supabase deployment)
-psycopg2-binary==2.9.9
+psycopg[binary]==3.2.1
 
 # Authentication
 PyJWT==2.9.0
