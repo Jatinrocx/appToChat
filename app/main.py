@@ -1,42 +1,56 @@
 """
-🚀 Chat App Backend — Main Entry Point
+Chat App Backend — Main Entry Point
 
-This is where FastAPI starts. It:
-1. Creates the app instance
-2. Creates all database tables on startup
-3. Will eventually mount all routers (auth, groups, messages, websocket)
-
-💡 LEARNING NOTE:
-- FastAPI() creates the web server
-- @app.on_event("startup") runs code when the server starts
-- Base.metadata.create_all() looks at ALL models that inherit from Base
-  and creates their tables in the database if they don't exist yet
+Wires together all routers, middleware, and startup logic.
 """
 
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from app.config import settings
 from app.database import engine, Base
 
 # Import all models so SQLAlchemy knows about them
 from app.models import User, Group, GroupMember, Message  # noqa: F401
 
-# ── Create the FastAPI app ──
+# Import routers
+from app.routers import auth, groups, messages
+from app.websocket import handler as ws_handler
+
+# Create the FastAPI app
 app = FastAPI(
     title=settings.APP_NAME,
     version=settings.APP_VERSION,
-    description="Real-time chat backend with WebSockets, RBAC, and file relay",
+    description="Real-time chat backend with WebSockets, RBAC, and file relay. "
+                "Built with FastAPI for a chat interface system assignment.",
+    docs_url="/docs",
+    redoc_url="/redoc",
 )
 
-# ── CORS Middleware ──
-# Allows the frontend (running on a different port/domain) to talk to our API
+# CORS Middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, restrict this to your frontend URL
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Mount routers
+app.include_router(auth.router)
+app.include_router(groups.router)
+app.include_router(ws_handler.router)
+app.include_router(messages.router)
+
+# Create upload directories
+os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
+for subdir in ["image", "audio", "document"]:
+    os.makedirs(os.path.join(settings.UPLOAD_DIR, subdir), exist_ok=True)
+
+# Serve uploaded files
+app.mount("/uploads", StaticFiles(directory=settings.UPLOAD_DIR), name="uploads")
 
 
 @app.on_event("startup")
@@ -45,16 +59,21 @@ def on_startup():
     print("[*] Creating database tables...")
     Base.metadata.create_all(bind=engine)
     print("[OK] Database tables ready!")
+    print(f"[OK] Swagger docs at http://localhost:8000/docs")
 
 
 @app.get("/", tags=["Health"])
 def health_check():
-    """
-    Health check endpoint.
-    Hit this to verify the server is running.
-    """
+    """Health check endpoint."""
     return {
         "status": "healthy",
         "app": settings.APP_NAME,
         "version": settings.APP_VERSION,
     }
+
+
+# Serve the frontend test page
+@app.get("/chat", tags=["Frontend"], include_in_schema=False)
+def serve_chat():
+    """Serve the chat test page."""
+    return FileResponse("static/index.html")

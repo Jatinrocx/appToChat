@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat App - Test Interface</title>
+    <style>
+        :root {
+            --bg-primary: #0f0f17;
+            --bg-secondary: #1a1a2e;
+            --bg-tertiary: #16213e;
+            --accent: #6c63ff;
+            --accent-hover: #5a52d5;
+            --accent-glow: rgba(108, 99, 255, 0.3);
+            --text-primary: #e8e8f0;
+            --text-secondary: #9898b0;
+            --text-muted: #5e5e7a;
+            --success: #4ade80;
+            --error: #f87171;
+            --warning: #fbbf24;
+            --border: #2a2a40;
+            --msg-sent: #2d2b55;
+            --msg-received: #1e1e35;
+            --radius: 12px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* ─── Layout ─── */
+        .app-container {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            height: 100vh;
+        }
+
+        /* ─── Sidebar ─── */
+        .sidebar {
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            background: linear-gradient(135deg, var(--bg-tertiary), var(--bg-secondary));
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.2rem;
+            background: linear-gradient(135deg, var(--accent), #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .user-info {
+            margin-top: 10px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .user-info .username {
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        /* ─── Auth Panel ─── */
+        .auth-panel {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: var(--bg-primary);
+        }
+
+        .auth-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 40px;
+            width: 400px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .auth-card h2 {
+            text-align: center;
+            margin-bottom: 24px;
+            background: linear-gradient(135deg, var(--accent), #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 1.6rem;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px 14px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 11px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px var(--accent-glow);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--accent);
+            border: 1px solid var(--border);
+            margin-top: 10px;
+        }
+
+        .btn-secondary:hover {
+            background: var(--accent-glow);
+        }
+
+        .btn-small {
+            width: auto;
+            padding: 6px 14px;
+            font-size: 0.8rem;
+        }
+
+        .error-msg {
+            color: var(--error);
+            font-size: 0.85rem;
+            margin-top: 8px;
+            text-align: center;
+        }
+
+        /* ─── Groups List ─── */
+        .groups-section {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .section-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            padding: 10px;
+        }
+
+        .group-item {
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 4px;
+        }
+
+        .group-item:hover { background: var(--bg-tertiary); }
+
+        .group-item.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        .group-item .group-name { font-weight: 600; font-size: 0.95rem; }
+
+        .group-item .group-meta {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        .group-item.active .group-meta { color: rgba(255,255,255,0.7); }
+
+        /* ─── Create Group ─── */
+        .create-group-bar {
+            padding: 12px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 8px;
+        }
+
+        .create-group-bar input {
+            flex: 1;
+            min-width: 0;
+            padding: 8px 12px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 0.85rem;
+        }
+
+        .create-group-bar input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .create-group-bar button {
+            flex-shrink: 0;
+        }
+
+        /* ─── Chat Panel ─── */
+        .chat-panel {
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-primary);
+        }
+
+        .chat-header {
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-secondary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-header h2 { font-size: 1.1rem; }
+
+        .online-count {
+            font-size: 0.8rem;
+            color: var(--success);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .online-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        /* ─── Messages ─── */
+        .messages-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .message {
+            max-width: 70%;
+            padding: 10px 16px;
+            border-radius: 16px;
+            font-size: 0.92rem;
+            line-height: 1.5;
+            animation: fadeIn 0.2s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.sent {
+            align-self: flex-end;
+            background: var(--msg-sent);
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.received {
+            align-self: flex-start;
+            background: var(--msg-received);
+            border: 1px solid var(--border);
+            border-bottom-left-radius: 4px;
+        }
+
+        .message .sender {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 4px;
+        }
+
+        .message .timestamp {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+            text-align: right;
+        }
+
+        .system-msg {
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            padding: 6px;
+        }
+
+        .typing-indicator {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            padding: 4px 24px;
+            min-height: 24px;
+            font-style: italic;
+        }
+
+        /* ─── Input Bar ─── */
+        .input-bar {
+            padding: 16px 24px;
+            border-top: 1px solid var(--border);
+            background: var(--bg-secondary);
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .input-bar input {
+            flex: 1;
+            padding: 12px 18px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            transition: border-color 0.2s;
+        }
+
+        .input-bar input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .send-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--accent);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .send-btn:hover {
+            background: var(--accent-hover);
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px var(--accent-glow);
+        }
+
+        .send-btn svg { width: 20px; height: 20px; fill: white; }
+
+        .file-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: transparent;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            color: var(--text-secondary);
+        }
+
+        .file-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* ─── Members Panel ─── */
+        .members-panel {
+            padding: 12px;
+            border-top: 1px solid var(--border);
+        }
+
+        .member-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 10px;
+            font-size: 0.85rem;
+            border-radius: 6px;
+        }
+
+        .member-item:hover { background: var(--bg-primary); }
+
+        .role-badge {
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .role-admin { background: rgba(251, 191, 36, 0.2); color: var(--warning); }
+        .role-write { background: rgba(74, 222, 128, 0.2); color: var(--success); }
+        .role-read { background: rgba(152, 152, 176, 0.2); color: var(--text-secondary); }
+
+        /* ─── Empty State ─── */
+        .empty-state {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: var(--text-muted);
+        }
+
+        .empty-state svg { width: 64px; height: 64px; margin-bottom: 16px; opacity: 0.3; }
+
+        /* ─── Add Member Modal ─── */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        .modal {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            width: 360px;
+        }
+
+        .modal h3 { margin-bottom: 16px; }
+
+        .hidden { display: none !important; }
+
+        /* ─── Scrollbar ─── */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+        .file-message {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            background: rgba(108, 99, 255, 0.1);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .file-message .file-icon {
+            width: 36px; height: 36px;
+            background: var(--accent);
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.8rem; font-weight: 700; color: white;
+        }
+
+        .file-message .file-info {
+            flex: 1;
+        }
+
+        .file-message .file-name { font-weight: 600; font-size: 0.85rem; }
+        .file-message .file-size { font-size: 0.75rem; color: var(--text-muted); }
+        .logout-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--error);
+            padding: 4px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+        }
+        .logout-btn:hover {
+            background: rgba(248, 113, 113, 0.1);
+        }
+    </style>
+</head>
+<body>
+
+<!-- ═══════════ AUTH SCREEN ═══════════ -->
+<div id="authScreen" class="auth-panel">
+    <div class="auth-card">
+        <h2>Chat App</h2>
+
+        <div id="loginForm">
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="loginEmail" placeholder="you@example.com">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="loginPassword" placeholder="Your password">
+            </div>
+            <button class="btn btn-primary" onclick="login()">Login</button>
+            <button class="btn btn-secondary" onclick="showRegister()">Create Account</button>
+            <div id="loginError" class="error-msg hidden"></div>
+        </div>
+
+        <div id="registerForm" class="hidden">
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="regEmail" placeholder="you@example.com">
+            </div>
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="regUsername" placeholder="your_username">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="regPassword" placeholder="Min 6 characters">
+            </div>
+            <button class="btn btn-primary" onclick="register()">Create Account</button>
+            <button class="btn btn-secondary" onclick="showLogin()">Back to Login</button>
+            <div id="regError" class="error-msg hidden"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════ CHAT SCREEN ═══════════ -->
+<div id="chatScreen" class="app-container hidden">
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h1>Chat App</h1>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+            <div class="user-info">
+                Logged in as <span class="username" id="currentUsername">—</span>
+            </div>
+        </div>
+
+        <div class="groups-section" id="groupsList">
+            <div class="section-title">Your Groups</div>
+        </div>
+
+        <div class="create-group-bar">
+            <input type="text" id="newGroupName" placeholder="New group..." onkeypress="if(event.key==='Enter')createGroup()">
+            <button class="btn btn-primary btn-small" onclick="createGroup()" title="Create Group">+</button>
+            <button class="btn btn-secondary btn-small" onclick="startDM()" title="Direct Message" style="margin-left: 4px;">DM</button>
+        </div>
+    </div>
+
+    <!-- Chat Panel -->
+    <div class="chat-panel" id="chatPanel">
+        <div class="empty-state" id="emptyState">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/></svg>
+            <p>Select a group to start chatting</p>
+        </div>
+
+        <div id="activeChat" class="hidden" style="display:flex;flex-direction:column;height:100%;">
+            <div class="chat-header">
+                <div>
+                    <h2 id="chatGroupName">—</h2>
+                    <div class="online-count">
+                        <div class="online-dot"></div>
+                        <span id="onlineCount">0 online</span>
+                    </div>
+                </div>
+                <div style="display:flex;gap:8px;">
+                    <button class="btn btn-small btn-secondary" onclick="showAddMember()">Add Member</button>
+                    <button class="btn btn-small btn-secondary" onclick="toggleMembers()">Members</button>
+                </div>
+            </div>
+
+            <div id="membersPanel" class="members-panel hidden"></div>
+
+            <div class="messages-container" id="messagesContainer"></div>
+
+            <div class="typing-indicator" id="typingIndicator"></div>
+
+            <div class="input-bar">
+                <input type="file" id="fileInput" style="display:none" onchange="uploadFile()">
+                <button class="file-btn" onclick="document.getElementById('fileInput').click()" title="Attach file">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
+                </button>
+                <input type="text" id="messageInput" placeholder="Type a message..."
+                       onkeypress="if(event.key==='Enter')sendMessage()"
+                       oninput="handleTyping()">
+                <button class="send-btn" onclick="sendMessage()">
+                    <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════ MODALS ═══════════ -->
+<div id="addMemberModal" class="modal-overlay hidden" onclick="if(event.target===this)this.classList.add('hidden')">
+    <div class="modal">
+        <h3>Add Member</h3>
+        <div class="form-group">
+            <label>Username</label>
+            <input type="text" id="addMemberUsername" placeholder="Enter username">
+        </div>
+        <div class="form-group">
+            <label>Role</label>
+            <select id="addMemberRole" style="width:100%;padding:10px;background:var(--bg-primary);border:1px solid var(--border);border-radius:8px;color:var(--text-primary);">
+                <option value="write">Write (can send messages)</option>
+                <option value="read">Read (view only)</option>
+                <option value="admin">Admin (full control)</option>
+            </select>
+        </div>
+        <button class="btn btn-primary" onclick="addMember()" style="width:100%;margin-top:10px;">Add Member</button>
+        <button class="btn btn-secondary" onclick="document.getElementById('addMemberModal').classList.add('hidden')" style="width:100%;margin-top:10px;">Cancel</button>
+        <div id="addMemberError" class="error-msg hidden"></div>
+    </div>
+</div>
+
+<div id="dmModal" class="modal-overlay hidden" onclick="if(event.target===this)this.classList.add('hidden')">
+    <div class="modal">
+        <h3>Direct Message</h3>
+        <div class="form-group">
+            <label>Username</label>
+            <input type="text" id="dmUsername" placeholder="Enter username (e.g. jatin)" onkeypress="if(event.key==='Enter')submitDM()">
+        </div>
+        <button class="btn btn-primary" onclick="submitDM()" style="width:100%;margin-top:10px;">Start Chat</button>
+        <button class="btn btn-secondary" onclick="document.getElementById('dmModal').classList.add('hidden')" style="width:100%;margin-top:10px;">Cancel</button>
+        <div id="dmError" class="error-msg hidden"></div>
+    </div>
+</div>
+
+<script>
+    // ═══════════ STATE ═══════════
+    const API = window.location.origin;
+    let token = localStorage.getItem('chat_token');
+    let currentUser = JSON.parse(localStorage.getItem('chat_user') || 'null');
+    let currentGroupId = null;
+    let ws = null;
+    let typingTimeout = null;
+    let isTyping = false;
+
+    // Auto-login if token exists
+    if (token && currentUser) {
+        showChatScreen();
+    }
+
+    // ═══════════ AUTH ═══════════
+    function showRegister() {
+        document.getElementById('loginForm').classList.add('hidden');
+        document.getElementById('registerForm').classList.remove('hidden');
+    }
+
+    function showLogin() {
+        document.getElementById('registerForm').classList.add('hidden');
+        document.getElementById('loginForm').classList.remove('hidden');
+    }
+
+    async function register() {
+        const email = document.getElementById('regEmail').value;
+        const username = document.getElementById('regUsername').value;
+        const password = document.getElementById('regPassword').value;
+        const errEl = document.getElementById('regError');
+        errEl.classList.add('hidden');
+
+        try {
+            const res = await fetch(`${API}/auth/register`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({email, username, password}),
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.detail || 'Registration failed');
+
+            token = data.access_token;
+            currentUser = data.user;
+            localStorage.setItem('chat_token', token);
+            localStorage.setItem('chat_user', JSON.stringify(currentUser));
+            showChatScreen();
+        } catch (e) {
+            errEl.textContent = e.message;
+            errEl.classList.remove('hidden');
+        }
+    }
+
+    async function login() {
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+        const errEl = document.getElementById('loginError');
+        errEl.classList.add('hidden');
+
+        try {
+            const res = await fetch(`${API}/auth/login`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({email, password}),
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.detail || 'Login failed');
+
+            token = data.access_token;
+            currentUser = data.user;
+            localStorage.setItem('chat_token', token);
+            localStorage.setItem('chat_user', JSON.stringify(currentUser));
+            showChatScreen();
+        } catch (e) {
+            errEl.textContent = e.message;
+            errEl.classList.remove('hidden');
+        }
+    }
+
+    function logout() {
+        token = null;
+        currentUser = null;
+        localStorage.removeItem('chat_token');
+        localStorage.removeItem('chat_user');
+        if (ws) ws.close();
+        document.getElementById('chatScreen').classList.add('hidden');
+        document.getElementById('authScreen').classList.remove('hidden');
+    }
+
+    function showChatScreen() {
+        document.getElementById('authScreen').classList.add('hidden');
+        document.getElementById('chatScreen').classList.remove('hidden');
+        document.getElementById('currentUsername').textContent = currentUser.username;
+        loadGroups();
+        
+        // Auto-refresh the group list every 3 seconds so users see when they are added to new groups
+        if (!window.groupPoll) {
+            window.groupPoll = setInterval(loadGroups, 3000);
+        }
+    }
+
+    // ═══════════ GROUPS ═══════════
+    async function loadGroups() {
+        try {
+            const res = await fetch(`${API}/groups/me`, {
+                headers: {'Authorization': `Bearer ${token}`},
+            });
+            const groups = await res.json();
+            renderGroups(groups);
+        } catch (e) {
+            console.error('Failed to load groups:', e);
+        }
+    }
+
+    function renderGroups(groups) {
+        const container = document.getElementById('groupsList');
+        container.innerHTML = '<div class="section-title">Your Groups</div>';
+
+        groups.forEach(g => {
+            const div = document.createElement('div');
+            div.className = `group-item ${currentGroupId === g.id ? 'active' : ''}`;
+            div.innerHTML = `
+                <div class="group-name">${escapeHtml(g.name)}</div>
+                <div class="group-meta">${g.member_count || 0} members</div>
+            `;
+            div.onclick = () => joinGroup(g.id, g.name);
+            container.appendChild(div);
+        });
+    }
+
+    async function createGroup() {
+        const input = document.getElementById('newGroupName');
+        const name = input.value.trim();
+        if (!name) return;
+
+        try {
+            const res = await fetch(`${API}/groups`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: JSON.stringify({name}),
+            });
+            if (!res.ok) throw new Error('Failed to create group');
+            input.value = '';
+            loadGroups();
+        } catch (e) {
+            alert(e.message);
+        }
+    }
+
+    function startDM() {
+        document.getElementById('dmModal').classList.remove('hidden');
+        document.getElementById('dmUsername').value = '';
+        document.getElementById('dmError').textContent = '';
+        document.getElementById('dmUsername').focus();
+    }
+
+    async function submitDM() {
+        const targetUsername = document.getElementById('dmUsername').value.trim();
+        const errEl = document.getElementById('dmError');
+        if (!targetUsername) {
+            errEl.textContent = 'Username is required';
+            return;
+        }
+        errEl.textContent = '';
+        
+        try {
+            // Send atomic DM creation request
+            const res = await fetch(`${API}/groups/dm`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({username: targetUsername, role: 'write'})
+            });
+            
+            if (!res.ok) {
+                const errData = await res.json();
+                throw new Error(errData.detail || 'Unknown error');
+            }
+            
+            const group = await res.json();
+            
+            document.getElementById('dmModal').classList.add('hidden');
+            loadGroups();
+            joinGroup(group.id, group.name);
+            
+        } catch (e) {
+            errEl.textContent = e.message;
+            errEl.classList.remove('hidden');
+        }
+    }
+
+    // ═══════════ WEBSOCKET ═══════════
+    function joinGroup(groupId, groupName) {
+        if (ws) ws.close();
+        currentGroupId = groupId;
+
+        document.getElementById('emptyState').classList.add('hidden');
+        document.getElementById('activeChat').classList.remove('hidden');
+        document.getElementById('activeChat').style.display = 'flex';
+        document.getElementById('chatGroupName').textContent = groupName;
+        document.getElementById('messagesContainer').innerHTML = '';
+        document.getElementById('typingIndicator').textContent = '';
+
+        // Load message history
+        loadHistory(groupId);
+
+        // Connect WebSocket
+        const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+        ws = new WebSocket(`${wsProtocol}//${location.host}/ws/${groupId}?token=${token}`);
+
+        ws.onopen = () => {
+            addSystemMessage('Connected to chat');
+            loadGroups(); // Refresh to highlight active
+        };
+
+        ws.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            handleWsMessage(data);
+        };
+
+        ws.onclose = () => {
+            addSystemMessage('Disconnected from chat');
+        };
+
+        ws.onerror = (e) => {
+            console.error('WebSocket error:', e);
+        };
+    }
+
+    async function loadHistory(groupId) {
+        try {
+            const res = await fetch(`${API}/messages/${groupId}/history?page=1&page_size=100`, {
+                headers: {'Authorization': `Bearer ${token}`},
+            });
+            const data = await res.json();
+            data.messages.forEach(m => {
+                addMessageToUI(m.sender_username, m.content, m.sender_id === currentUser.id, m.created_at, m.message_type, m.file_name, m.file_size);
+            });
+            scrollToBottom();
+        } catch (e) {
+            console.error('Failed to load history:', e);
+        }
+    }
+
+    function handleWsMessage(data) {
+        switch (data.type) {
+            case 'text_message':
+                addMessageToUI(data.sender_username, data.content, data.sender_id === currentUser.id, data.timestamp);
+                scrollToBottom();
+                break;
+
+            case 'typing':
+                updateTypingIndicator(data.username, data.is_typing);
+                break;
+
+            case 'user_joined':
+                addSystemMessage(`${data.username} joined the chat`);
+                break;
+
+            case 'user_left':
+                addSystemMessage(`${data.username} left the chat`);
+                break;
+
+            case 'online_users':
+                document.getElementById('onlineCount').textContent = `${data.users.length} online`;
+                break;
+
+            case 'file_message':
+                addMessageToUI(data.sender_username, data.content, data.sender_id === currentUser.id, data.timestamp, data.message_type, data.file_name, data.file_size);
+                scrollToBottom();
+                break;
+
+            case 'error':
+                addSystemMessage(`Error: ${data.message}`);
+                break;
+        }
+    }
+
+    // ═══════════ MESSAGES ═══════════
+    function sendMessage() {
+        const input = document.getElementById('messageInput');
+        const content = input.value.trim();
+        if (!content || !ws || ws.readyState !== WebSocket.OPEN) return;
+
+        ws.send(JSON.stringify({type: 'text_message', content}));
+        input.value = '';
+        stopTyping();
+    }
+
+    function addMessageToUI(sender, content, isSent, timestamp, msgType = 'text', fileName = null, fileSize = null) {
+        const container = document.getElementById('messagesContainer');
+        const div = document.createElement('div');
+        div.className = `message ${isSent ? 'sent' : 'received'}`;
+
+        let body = '';
+        if (!isSent) body += `<div class="sender">${escapeHtml(sender)}</div>`;
+
+        if (msgType !== 'text' && fileName) {
+            const underscoreIdx = fileName.indexOf('_');
+            const displayFileName = underscoreIdx !== -1 ? fileName.substring(underscoreIdx + 1) : fileName;
+            const ext = displayFileName.split('.').pop().toUpperCase();
+            const size = fileSize ? formatFileSize(fileSize) : '';
+            const fileUrl = `${API}/uploads/${msgType}/${fileName}`;
+            body += `<div class="file-message">
+                <div class="file-icon">${ext}</div>
+                <div class="file-info">
+                    <a href="${fileUrl}" target="_blank" download="${escapeHtml(displayFileName)}" class="file-name" style="color:var(--accent); text-decoration:underline;">${escapeHtml(displayFileName)}</a>
+                    <div class="file-size">${msgType} - ${size}</div>
+                </div>
+            </div>`;
+            if (content) body += `<div style="margin-top:6px">${escapeHtml(content)}</div>`;
+        } else {
+            body += `<div>${escapeHtml(content || '')}</div>`;
+        }
+
+        if (timestamp) {
+            const d = new Date(timestamp);
+            body += `<div class="timestamp">${d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</div>`;
+        }
+
+        div.innerHTML = body;
+        container.appendChild(div);
+    }
+
+    function addSystemMessage(text) {
+        const container = document.getElementById('messagesContainer');
+        const div = document.createElement('div');
+        div.className = 'system-msg';
+        div.textContent = text;
+        container.appendChild(div);
+        scrollToBottom();
+    }
+
+    function scrollToBottom() {
+        const c = document.getElementById('messagesContainer');
+        c.scrollTop = c.scrollHeight;
+    }
+
+    // ═══════════ TYPING ═══════════
+    function handleTyping() {
+        if (!ws || ws.readyState !== WebSocket.OPEN) return;
+
+        if (!isTyping) {
+            isTyping = true;
+            ws.send(JSON.stringify({type: 'typing_start'}));
+        }
+
+        clearTimeout(typingTimeout);
+        typingTimeout = setTimeout(stopTyping, 2000);
+    }
+
+    function stopTyping() {
+        if (isTyping && ws && ws.readyState === WebSocket.OPEN) {
+            isTyping = false;
+            ws.send(JSON.stringify({type: 'typing_stop'}));
+        }
+    }
+
+    const typingUsers = new Set();
+    function updateTypingIndicator(username, isTyping) {
+        if (isTyping) typingUsers.add(username);
+        else typingUsers.delete(username);
+
+        const el = document.getElementById('typingIndicator');
+        if (typingUsers.size === 0) {
+            el.textContent = '';
+        } else if (typingUsers.size === 1) {
+            el.textContent = `${[...typingUsers][0]} is typing...`;
+        } else {
+            el.textContent = `${typingUsers.size} people typing...`;
+        }
+    }
+
+    function formatFileSize(bytes) {
+        if (bytes < 1024) return bytes + ' B';
+        if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+        return (bytes / 1048576).toFixed(1) + ' MB';
+    }
+
+    // ═══════════ FILE UPLOAD ═══════════
+    async function uploadFile() {
+        const fileInput = document.getElementById('fileInput');
+        const file = fileInput.files[0];
+        if (!file || !currentGroupId) return;
+
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('group_id', currentGroupId);
+
+        try {
+            const res = await fetch(`${API}/messages/upload`, {
+                method: 'POST',
+                headers: {'Authorization': `Bearer ${token}`},
+                body: formData,
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.detail || 'Upload failed');
+
+            // Broadcast via websocket that a file was sent
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({
+                    type: 'file_message',
+                    content: data.content,
+                    message_type: data.message_type,
+                    file_name: data.file_name,
+                    file_size: data.file_size
+                }));
+            }
+        } catch (e) {
+            alert('Upload failed: ' + e.message);
+        }
+        fileInput.value = '';
+    }
+
+    // ═══════════ MEMBERS ═══════════
+    function toggleMembers() {
+        const panel = document.getElementById('membersPanel');
+        if (panel.classList.contains('hidden')) {
+            loadMembers();
+            panel.classList.remove('hidden');
+        } else {
+            panel.classList.add('hidden');
+        }
+    }
+
+    async function loadMembers() {
+        if (!currentGroupId) return;
+        try {
+            const res = await fetch(`${API}/groups/${currentGroupId}`, {
+                headers: {'Authorization': `Bearer ${token}`},
+            });
+            const data = await res.json();
+            renderMembers(data.members);
+        } catch (e) {
+            console.error('Failed to load members:', e);
+        }
+    }
+
+    function renderMembers(members) {
+        const panel = document.getElementById('membersPanel');
+        panel.innerHTML = '<div class="section-title">Group Members</div>';
+        members.forEach(m => {
+            const div = document.createElement('div');
+            div.className = 'member-item';
+            div.innerHTML = `
+                <span>${escapeHtml(m.username)} ${m.user_id === currentUser.id ? '(you)' : ''}</span>
+                <span class="role-badge role-${m.role}">${m.role}</span>
+            `;
+            panel.appendChild(div);
+        });
+    }
+
+    function showAddMember() {
+        document.getElementById('addMemberModal').classList.remove('hidden');
+        document.getElementById('addMemberError').classList.add('hidden');
+    }
+
+    async function addMember() {
+        const username = document.getElementById('addMemberUsername').value.trim();
+        const role = document.getElementById('addMemberRole').value;
+        const errEl = document.getElementById('addMemberError');
+
+        if (!username || !currentGroupId) return;
+
+        try {
+            const res = await fetch(`${API}/groups/${currentGroupId}/members`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: JSON.stringify({username, role}),
+            });
+            const data = await res.json();
+            if (!res.ok) {
+                let errMsg = 'Failed to add member';
+                if (typeof data.detail === 'string') errMsg = data.detail;
+                else if (Array.isArray(data.detail)) errMsg = data.detail.map(e => e.msg).join(', ');
+                throw new Error(errMsg);
+            }
+
+            document.getElementById('addMemberModal').classList.add('hidden');
+            document.getElementById('addMemberUsername').value = '';
+            loadMembers();
+            loadGroups();
+        } catch (e) {
+            errEl.textContent = e.message;
+            errEl.classList.remove('hidden');
+        }
+    }
+
+    // ═══════════ UTILS ═══════════
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    function formatFileSize(bytes) {
+        if (bytes < 1024) return bytes + ' B';
+        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+        return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+    }
+</script>
+
+</body>
+</html>
