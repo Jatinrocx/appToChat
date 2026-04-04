@@ -6,8 +6,8 @@ uvicorn[standard]==0.30.6
 sqlalchemy==2.0.35
 
 # PostgreSQL driver (for Supabase deployment)
-# asyncpg will be used when deploying to Supabase
-# For local dev, we use SQLite (no extra driver needed)
+psycopg2-binary==2.9.9
+asyncpg==0.29.0
 
 # Authentication
 PyJWT==2.9.0
