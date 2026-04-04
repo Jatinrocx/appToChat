@@ -19,11 +19,20 @@ from app.config import settings
 # ── Create the database engine ──
 # connect_args is only needed for SQLite (allows multi-threaded access)
 connect_args = {}
-if settings.DATABASE_URL.startswith("sqlite"):
+db_url = settings.DATABASE_URL
+
+if db_url.startswith("sqlite"):
     connect_args = {"check_same_thread": False}
+    
+# Render / Supabase provides URLs starting with postgres:// or postgresql://
+# SQLAlchemy defaults to psycopg2, but we use the modern psycopg3!
+if db_url.startswith("postgres://"):
+    db_url = db_url.replace("postgres://", "postgresql+psycopg://", 1)
+elif db_url.startswith("postgresql://"):
+    db_url = db_url.replace("postgresql://", "postgresql+psycopg://", 1)
 
 engine = create_engine(
-    settings.DATABASE_URL,
+    db_url,
     connect_args=connect_args,
     echo=settings.DEBUG  # Prints SQL queries to console when DEBUG=True (great for learning!)
 )
