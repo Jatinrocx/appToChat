@@ -1,0 +1,8 @@
+# Ignore these
+venv/
+__pycache__/
+*.pyc
+.env
+chat.db
+uploads/
+*.egg-info/
