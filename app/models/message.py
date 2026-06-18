@@ -1,16 +1,12 @@
 """
 💬 Message Model
-
 Stores every message sent in a group chat.
-
 💡 LEARNING NOTES — Message Types:
 This answers the assignment question:
 "How would you support other message types like audio, documents, etc?"
-
 → Using a `message_type` column! The message table stores METADATA only.
 → For files (audio, images, docs), the actual file is relayed to recipients.
 → The DB just records: "User X sent an audio file called voice.mp3 at 2pm"
-
 message_type can be:
 - "text"     → content has the message text
 - "image"    → file_name has the filename, content has optional caption
