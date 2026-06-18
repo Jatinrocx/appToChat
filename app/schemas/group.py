@@ -4,7 +4,6 @@ from pydantic import BaseModel, field_validator
 from datetime import datetime
 from typing import Optional, List
 
-
 class GroupCreate(BaseModel):
     """Request body for POST /groups"""
     name: str
@@ -15,7 +14,6 @@ class GroupCreate(BaseModel):
         if len(v.strip()) < 2:
             raise ValueError("Group name must be at least 2 characters")
         return v.strip()
-
 
 class AddMember(BaseModel):
     """Request body for POST /groups/{id}/members"""
@@ -40,7 +38,6 @@ class UpdateRole(BaseModel):
         if v not in ("admin", "write", "read"):
             raise ValueError("Role must be 'admin', 'write', or 'read'")
         return v
-
 
 class MemberResponse(BaseModel):
     """A member in a group"""
