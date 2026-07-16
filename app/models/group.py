@@ -16,7 +16,6 @@ This answers the assignment question:
 """
 
 from datetime import datetime, timezone
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Enum
 from sqlalchemy.orm import relationship
 from app.database import Base
 import enum
